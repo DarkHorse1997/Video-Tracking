@@ -1,3 +1,43 @@
+'''
+===================================================
+              Calculate Displacement Vector
+===================================================
+Author: Tanmoy Das
+Email : tanmoydas1997@gmail.com
+
+
+convert_xy_to_points(centroid_x,centroid_y)
+    This function takes in two ndarray objects of x and y coordinates of centroids and combines them to output a ndarray object of Centroid Coordinates
+
+Parameters:	
+centroid_x : ndarray(Numpy Array)
+    A Numpy Array containing the x coordinates of centroids after K-means
+centroid_y : ndarray(Numpy Array)
+    A Numpy Array containing the y coordinates of centroids after K-means
+Returns:	
+cent : ndarray(Numpy Array)
+    A Numpy Array containing the x and y coordinates of centroids after K-means
+
+find_distance(cent,no_of_clusters,distance_type,path)
+    This function finds the distance vector of Landmark Points between key-frames. 
+
+
+Parameters:	
+cent : ndarray(Numpy Array)
+    A Numpy Array containing the x and y coordinates of centroids after K-means
+no_of_clusters : int
+    Number of centroid clusters
+path : string
+    Path to store the displacement vector
+Returns:	
+distance_vector : ndarray(Numpy Array)
+    A Numpy Array containing distance vector of Landmark Points. 
+
+convert_to_dataframe(array)
+    This function converts a numpy array to a pandas dataframe according to our requirements
+    
+'''
+
 import numpy as np
 from scipy.spatial import distance
 import os

@@ -1,3 +1,36 @@
+'''
+===================================================
+              Obtain Landmark Points 
+===================================================
+Author: Tanmoy Das
+Email : tanmoydas1997@gmail.com
+
+
+FrameExtract(path1,path2)
+    This functions takes in a video and returns a 3D numpy array containing all the landmark points of all the frames of that video. It also saves this Landmark Points in a file for later use.
+
+Parameters:	
+path1 : string
+    The file path to the video input file 
+path2 : string
+    The file path to the dlib model
+Returns:	
+p1 : Numpy Array
+    Array of Landmark Points
+
+apply_kmeans(points,path)
+    This function takes in a numpy array of Landmark Points for a single video and applies K-means Clustering to it to get key frames. It saves the centroid coordinates in a file.
+
+Parameters:	
+points: Numpy Array 
+    The Numpy Array of Landmark Points of all frames of a video. 
+path : string
+    The file path to the dlib model
+Returns:	
+
+
+'''
+
 import cv2
 import dlib
 import os
