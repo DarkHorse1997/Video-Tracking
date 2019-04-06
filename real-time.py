@@ -1,6 +1,7 @@
 import seaborn as sns
 import matplotlib.pyplot as plt 
 import numpy as np
+import pandas as pd
 import os
 sns.set()
 from displacement_vector import convert_to_dataframe
@@ -26,12 +27,36 @@ def convert_xy_to_points(centroid_x,centroid_y):
     return cent
     #print(cent)
 
-
+#https://stackoverflow.com/questions/48482256/what-is-the-pandas-panel-deprecation-warning-actually-recommending
 def plot_landmark(p1):
-    print(p1.shape)
-    print(p1[0].shape)
-    print(p1[0][0].shape)
+    print(p1.shape) #(#Frames,#Landmarks,#Coordinates)
+    
+    panel = pd.Panel(
+                    p1,
+                    items = ['Frame {}' .format(i) for i in range(0,p1.shape[0])],
+                    major_axis = ['Landmark {}' .format(i) for i in range(0,68) ],
+                    minor_axis = ['x','y']
+                    )
+    pnl = panel.to_frame()
+    print(pnl)
+    dat = pnl.xs('Landmark 0')
+    
+    ax = sns.pointplot(data = dat, x = dat.xs('x'), y = dat.xs('y'))
+    plt.show()
+    ax = sns.lineplot(data = dat, x = dat.xs('x'), y = dat.xs('y'))
+    plt.show()
+    
+    print(pnl.xs('Landmark 0'))
+     # Print by Landmarks
+    #print(pnl['Frame 0']) # Print by Frames
+    
+    
 
+    print("\n \n")
+    
+
+    
+    
 def plot_landmark1(frame,frame_no=-1):
     
     for i in range(len(frame)):

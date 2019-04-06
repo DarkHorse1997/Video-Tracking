@@ -56,15 +56,16 @@ def convert_to_dataframe(array):
     print("Converting Numpy array to Pandas Dataframe \n ")
     #print(array.shape[0])  #Number of key frames 5
     #print(array[0].shape[0])  #Number of landmark points 68
+    
     t1=[]
     for i in range(array[0].shape[0]):
         t1.append(f'landmark_{i}')
-
     
     t2=[]
 
     for i in range(array.shape[0]):
-        t2.append(f'frame {i} - {i+1}')    
+        t2.append(f'frame {i} - {i+1}') 
+           
     a = pd.DataFrame(data=array,index=t2,columns=t1)
     print(f'Shape of Output Dataframe : {a.shape}')
     a = a.reset_index()
