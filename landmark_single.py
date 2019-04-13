@@ -45,7 +45,7 @@ if __name__ == '__main__':
     
     for i in range(68):
         plot_displacement_single(i)
-    
+        print("Opening main")
         #print(path)   
        
         

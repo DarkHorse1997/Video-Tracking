@@ -45,7 +45,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 sns.set()
-folder = "subject1/surprise"
+folder = input()
 #path="dataset/s1_an_1.avi"
 
 def convert_xy_to_points(centroid_x,centroid_y):
@@ -90,7 +90,7 @@ def find_distance(cent,no_of_clusters,distance_type,path):
     print(f"Displacement Vector saved to file : {path + '/displacement_vector.out'}")
     return distance_vector
 
-def convert_to_dataframe(array): 
+def convert_to_dataframe(array,path): 
     print(f'Shape of Input array {array.shape}')
     #print(array[0].shape)
     print("Converting Numpy array to Pandas Dataframe \n ")
@@ -109,6 +109,7 @@ def convert_to_dataframe(array):
     a = pd.DataFrame(data=array,index=t2,columns=t1)
     print(f'Shape of Output Dataframe : {a.shape}')
     a = a.reset_index()
+    a.to_csv(path + "/displacement_vector.csv")
     print("Successfully Converted \n")
     print(f'Shape of Output Dataframe : {a.shape}')
     return a
@@ -187,7 +188,7 @@ if __name__ == '__main__':
         cent = convert_xy_to_points(centroid_x,centroid_y)
         p1 =  np.load(path + '/landmark_points_array.out.npy')
         displacement=find_distance(cent,cent.shape[0],'euclidean',path)
-        disp=convert_to_dataframe(displacement)
+        disp=convert_to_dataframe(displacement,path)
         #plot_displacement_single() # 
         plot_displacement_all(disp,filename)
      

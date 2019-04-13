@@ -39,6 +39,7 @@ def plot_landmark(p1):
                     )
     pnl = panel.to_frame()
     print(pnl)
+    pnl.to_csv("out.csv")
     dat = pnl.xs('Landmark 0')
     
     ax = sns.pointplot(data = dat, x = dat.xs('x'), y = dat.xs('y'))

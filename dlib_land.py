@@ -36,8 +36,9 @@ import dlib
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 #from imutils import face_utils
-folder = "subject1/surprise" #
+folder = input() #
 #path_of_video="dataset/s1_an_1.avi"
 path_of_model="shape_predictor_68_face_landmarks.dat"
 
@@ -88,11 +89,19 @@ def FrameExtract(path1,path2):
         count += 1
     p1=np.array(p)
     print(p1.shape)
+    panel = pd.Panel(
+                    p1,
+                    items = ['Frame {}' .format(i) for i in range(0,p1.shape[0])],
+                    major_axis = ['Landmark {}' .format(i) for i in range(0,68) ],
+                    minor_axis = ['x','y']
+                    )
+    pnl = panel.to_frame()
+    print(p1)
+    print(pnl)
+    pnl.to_csv(path1[:path1.find(".")]+'/landmark_points_dataframe.csv')
     np.save(path1[:path1.find(".")]+'/landmark_points_array.out', p1)
     #np.savetxt(path1[:path1.find(".")]+"/reshaped.txt", p1.reshape((3,-1)), fmt="%s", header=str(p1.shape))
     return p1
-
-
 
 def plot_landmark(frame,frame_no=-1):
     import matplotlib.pyplot as plt
@@ -104,7 +113,6 @@ def plot_landmark(frame,frame_no=-1):
     ax=plt.gca()
     ax.invert_yaxis()
     plt.show()
-
 
 def plot_landmark_on_frame(frame, path_of_image):
     import matplotlib.pyplot as plt
@@ -118,9 +126,6 @@ def plot_landmark_on_frame(frame, path_of_image):
         plt.text(x, y, i, ha="center", va="center", fontsize=8)
         plt.scatter(x, y, c='r', s=40)
     plt.show()
-
-
-
 
 def apply_kmeans(points,path):
     print(f"Applying k-means to {path[path.find('/')+1:]}")
@@ -145,15 +150,18 @@ def apply_kmeans(points,path):
 # Driver Code 
 if __name__ == '__main__': 
     
+
     video_file_list=os.listdir(folder)
 
     video_list = list(filter(lambda x: x.endswith('.avi'), video_file_list))
     print(f"List of videos: {video_list}")
+        
     for filename in video_list:
         path_of_video= folder + "/" + filename    
         point=FrameExtract(path_of_video,path_of_model)
         apply_kmeans(point,path_of_video)
 
-
+    
+    os.system('spd-say "your program has finished"')
 
 

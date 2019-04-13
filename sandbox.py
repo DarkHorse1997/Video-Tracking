@@ -16,3 +16,15 @@ dic = dict()
     pnl2 = panel2.to_frame()
     pn = panel2.to_xarray()
     #print(p11['y']) # Indexing by columns,need by rows
+
+
+'''This code snippet is used to traverse directories and return only those directories which contain video(avi) files'''
+
+for dirName, subdirList, fileList in os.walk(folder):
+        #print('Found directory: %s' % dirName)
+        if not fileList:
+            continue
+        else:
+
+            if('avi' in fileList[0]):
+                print(dirName)
