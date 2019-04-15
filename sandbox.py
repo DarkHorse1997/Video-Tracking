@@ -28,3 +28,28 @@ for dirName, subdirList, fileList in os.walk(folder):
 
             if('avi' in fileList[0]):
                 print(dirName)
+
+
+'''This code snippet is used to get list of video files in each of the folders '''
+
+import os 
+import glob
+l = glob.glob('subject *')
+
+
+for i in l:
+   os.chdir(i)
+   print(os.getcwd())
+   s = ['anger','disgust','fear','happiness','sadness','surprise']
+   for j in s:
+       os.chdir(j)
+       print(os.getcwd())
+       video = os.listdir('.') #files = [f for f in os.listdir('.') if os.path.isfile(f)] OR files = glob.glob(".avi")
+       print(video)
+       os.chdir("..")
+   os.chdir("..")
+
+
+
+
+
