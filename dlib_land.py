@@ -38,7 +38,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 #from imutils import face_utils
-folder = input() #
+folder = input()
+print(folder) #
 #path_of_video="dataset/s1_an_1.avi"
 path_of_model="shape_predictor_68_face_landmarks.dat"
 
