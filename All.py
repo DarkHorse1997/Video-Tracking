@@ -133,7 +133,7 @@ def apply_kmeans(points,path):
     
     np.savetxt(path[:path.find(".")]+'/centroid.out', centroid)
     
-def find_minframe(centroid,no_of_clusters):    
+def find_minframe(points,centroid,no_of_clusters):    
     #z = scipy.spatial.distance.cdist(A,B,'chebyshev')
     minframe=[]
     #print(z)
@@ -141,7 +141,7 @@ def find_minframe(centroid,no_of_clusters):
 
         dist=[]
         for j in range(50):
-            y = distance.cdist(p1[j],centroid[i],'euclidean')#cent
+            y = distance.cdist(points[j],centroid[i],'euclidean')#cent
             #print(y)
             #print(np.sum(np.diag(y)))
             dist.append(np.trace(y))
@@ -149,8 +149,9 @@ def find_minframe(centroid,no_of_clusters):
         dd=np.array(dist)
         minframe.append(np.argmin(dd))
     return minframe
-# NOTE:The following function does not work unless all frames are extracted and stored in frames/*
+# NOTE:The following function does not work unless all frames are extracted and stored in frames/**
 # NOTE:This can e fixed in FrameExtract
+# NOTE:This function has a lot of issues
 def list_of_key_frames():
     list_of_images=[]
     for i in minframe:
@@ -179,7 +180,7 @@ def grid_display(list_of_images, list_of_titles=[], no_of_columns=2, figsize=(10
         if len(list_of_titles) >= len(list_of_images):
             plt.title(list_of_titles[i])
 
-
+    #grid_display(list_of_images, list_of_titles=[], no_of_columns=3, figsize=(10,10))
 
 
     #See helper_snippets Snippet #2
