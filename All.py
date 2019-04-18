@@ -7,19 +7,18 @@ import pandas as pd
 import seaborn as sns
 from scipy.spatial import distance
 from sklearn.cluster import KMeans
-
-print (folder)
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.simplefilter(action='ignore', category=FutureWarning)
 sns.set()
 path_of_model="/home/tanmoydas1997/Documents/Video-Tracking/shape_predictor_68_face_landmarks.dat"
 #from imutils import face_utils
 folder = input()
-
 print(folder)
-
 index = folder.find("g/")
-folder = folder[index+2:]
-#path_of_video="dataset/s1_an_1.avi"
+folder = folder[index+1:]
 
+#path_of_video="dataset/s1_an_1.avi"
 
 def FrameExtract(path1,path2):
     print(f"Working with video file {path1[path1.find('/')+1:]} ")
@@ -81,7 +80,7 @@ def FrameExtract(path1,path2):
     np.save(path1[:path1.find(".")]+'/landmark_points_array.out', p1)
     #np.savetxt(path1[:path1.find(".")]+"/reshaped.txt", p1.reshape((3,-1)), fmt="%s", header=str(p1.shape))
     return p1
-
+# NOTE:The following function does not work unless all frames are extracted and stored 
 def plot_landmark(frame,frame_no=-1):
     import matplotlib.pyplot as plt
     for i in range(len(frame)):
@@ -92,9 +91,9 @@ def plot_landmark(frame,frame_no=-1):
     ax=plt.gca()
     ax.invert_yaxis()
     plt.show()
-
+# NOTE:The following function does not work unless all frames are extracted and stored 
 def plot_landmark_on_frame(frame, path_of_image):
-    import matplotlib.pyplot as plt
+    
     im = plt.imread(path_of_image)
     implot = plt.imshow(im)
     plt.show()
@@ -108,7 +107,6 @@ def plot_landmark_on_frame(frame, path_of_image):
 
 def elbow_curve(points):
     Nc = range(1, 20)
-
     kmeas = [KMeans(n_clusters=i) for i in Nc]
     Y = points
     score = [kmeas[i].fit(Y).inertia_ for i in range(len(kmeas))]
@@ -120,25 +118,32 @@ def elbow_curve(points):
 
 def apply_kmeans(points,path):
     print(f"Applying k-means to {path[path.find('/')+1:]}")
-    print(points.shape)
-    
+    print(points.shape)    
     no_of_clusters=3
     #X = np.array([[1, 2], [2, 3]], [1, 4, 2], [1, 0, 2], [4, 2, 3], [4, 4, 8], [4, 0, 6]])
-    new_points = np.reshape(points,(points.shape[0],68*2))
-    
+    new_points = np.reshape(points,(points.shape[0],68*2))    
     kmeans = KMeans(n_clusters=no_of_clusters, random_state=0).fit(new_points)
-
     centroid = kmeans.cluster_centers_
-    centroid = np.reshape(centroid,(no_of_clusters,68,2))
+    centroid = np.reshape(centroid,(no_of_clusters,68,2)) 
+    print(centroid.shape)
+    panel = pd.Panel(
+                    centroid,
+                    items = ['Frame {}' .format(i) for i in range(0,centroid.shape[0])],
+                    major_axis = ['Landmark {}' .format(i) for i in range(0,68) ],
+                    minor_axis = ['x','y']
+                    )
+    pnl = panel.to_frame()
     
-    np.savetxt(path[:path.find(".")]+'/centroid.out', centroid)
+    print(pnl)
+    pnl.to_csv(path[:path.find(".")]+'/centroid_points_dataframe.csv')
+    np.save(path[:path.find(".")]+'/centroid_points_array.out', centroid)   
+    #np.savetxt(path[:path.find(".")]+'/centroid.out', centroid)
     
 def find_minframe(points,centroid,no_of_clusters):    
     #z = scipy.spatial.distance.cdist(A,B,'chebyshev')
     minframe=[]
     #print(z)
     for i in range(no_of_clusters):
-
         dist=[]
         for j in range(50):
             y = distance.cdist(points[j],centroid[i],'euclidean')#cent
@@ -165,7 +170,6 @@ def list_of_key_frames():
 
 
 def grid_display(list_of_images, list_of_titles=[], no_of_columns=2, figsize=(10,10)):
-
     fig = plt.figure(figsize=figsize)
     column = 0
     for i in range(len(list_of_images)):
@@ -185,32 +189,7 @@ def grid_display(list_of_images, list_of_titles=[], no_of_columns=2, figsize=(10
 
     #See helper_snippets Snippet #2
     
-# Driver Code 
-if __name__ == '__main__': 
-    
-    print(folder)
 
-    video_file_list=os.listdir(folder)
-
-    video_list = list(filter(lambda x: x.endswith('.avi'), video_file_list))
-    print(f"List of videos: {video_list}")
-        
-    for filename in video_list:
-        path_of_video= folder + "/" + filename    
-        point=FrameExtract(path_of_video,path_of_model)
-        apply_kmeans(point,path_of_video)
-
-    
-    os.system('spd-say "your program has finished"')
-
-
-
-
-
-
-#path="dataset/s1_an_1.avi"
-
-#z = scipy.spatial.distance.cdist(A,B,'chebyshev')
 def find_distance(cent,no_of_clusters,distance_type,path):
     print(f"Finding {distance_type} distance between key points for {path[path.find('/')+1:]} ")
     
@@ -227,7 +206,7 @@ def find_distance(cent,no_of_clusters,distance_type,path):
         
     #print(np.array(distance_vector))
     distance_vector = np.array(distance_vector)
-    
+    print(distance_vector)
     np.savetxt(path + "/displacement_vector.out",distance_vector)
     print(f"Displacement Vector saved to file : {path + '/displacement_vector.out'}")
     return distance_vector
@@ -251,6 +230,7 @@ def convert_to_dataframe(array,path):
     a = pd.DataFrame(data=array,index=t2,columns=t1)
     print(f'Shape of Output Dataframe : {a.shape}')
     a = a.reset_index()
+    print(a)
     a.to_csv(path + "/displacement_vector.csv")
     print("Successfully Converted \n")
     print(f'Shape of Output Dataframe : {a.shape}')
@@ -315,27 +295,54 @@ def plot_displacement_single(): # This video helps to plot a SINGLE landmark poi
 
 
 if __name__ == '__main__': 
+    print(os.getcwd())
+    print(folder)
+
+    file_and_folder_list = os.listdir(folder)
     
-    video_file_list=os.listdir(folder)
-    #folder = "subject1/disgust"
-    video_list = list(filter(lambda x: not(x.endswith('.avi') or x.endswith('.svg') or x.endswith('.png')), video_file_list))
-    print(f"List of videos: {video_list}")
-    for filename in video_list:
-        path = folder + "/" + filename 
+    print(file_and_folder_list[0])
+    print(os.path.isdir(f'Subjects/suject1/anger/{file_and_folder_list[0]}'))
+    file_list = [f for f in file_and_folder_list if os.path.isfile(f)]
+    print(file_list)
+    folder_list = [fol for fol in file_and_folder_list if os.path.isdir(fol)]
+    print(f'List of folders : {folder_list}')
+    #video_list = list(filter(lambda x: x.endswith('.avi'), video_file_list))
+    
+    for filename in file_list:
+        path_of_video= filename    
+        point=FrameExtract(path_of_video,path_of_model)
+        apply_kmeans(point,path_of_video)
+ 
+
+
+    
+    
+    
+    for foldername in folder_list:
+        path = foldername 
         #print(path)   
-        centroid_x = np.loadtxt(path + '/centroid_x.out')
-        centroid_y = np.loadtxt(path + '/centroid_y.out')
-        cent = convert_xy_to_points(centroid_x,centroid_y)
+        centroid = np.load(path + '/centroid_points_array.out.npy')
+        print(centroid.shape)
         p1 =  np.load(path + '/landmark_points_array.out.npy')
-        displacement=find_distance(cent,cent.shape[0],'euclidean',path)
+        displacement=find_distance(centroid,centroid.shape[0],'euclidean',path)
         disp=convert_to_dataframe(displacement,path)
         #plot_displacement_single() # 
+        # NOTE : Done till this check the following statement which gives errors
         plot_displacement_all(disp,filename)
      
     #plt.savefig('anger.svg', format='svg', dpi=1200)
     #plt.show()
-   
+    #os.system('spd-say "your program has finished"')
+
+# Driver Code 
 
 
+
+
+
+
+#path="dataset/s1_an_1.avi"
+
+#z = scipy.spatial.distance.cdist(A,B,'chebyshev')
 
     
