@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import cv2
 import dlib
 import os
@@ -7,16 +10,13 @@ import pandas as pd
 import seaborn as sns
 from scipy.spatial import distance
 from sklearn.cluster import KMeans
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning) 
-warnings.simplefilter(action='ignore', category=FutureWarning)
+
 sns.set()
 path_of_model="/home/tanmoydas1997/Documents/Video-Tracking/shape_predictor_68_face_landmarks.dat"
 #from imutils import face_utils
 folder = input()
-print(folder)
-index = folder.find("g/")
-folder = folder[index+1:]
+
+
 
 #path_of_video="dataset/s1_an_1.avi"
 
@@ -74,8 +74,8 @@ def FrameExtract(path1,path2):
                     minor_axis = ['x','y']
                     )
     pnl = panel.to_frame()
-    print(p1)
-    print(pnl)
+    #print(p1)
+    #print(pnl)
     pnl.to_csv(path1[:path1.find(".")]+'/landmark_points_dataframe.csv')
     np.save(path1[:path1.find(".")]+'/landmark_points_array.out', p1)
     #np.savetxt(path1[:path1.find(".")]+"/reshaped.txt", p1.reshape((3,-1)), fmt="%s", header=str(p1.shape))
@@ -116,16 +116,16 @@ def elbow_curve(points):
     plt.title('Elbow Curve')
     plt.show()
 
-def apply_kmeans(points,path):
+def apply_kmeans(points,path,no_of_clusters):
     print(f"Applying k-means to {path[path.find('/')+1:]}")
-    print(points.shape)    
-    no_of_clusters=3
+    #print(points.shape)    
+    #no_of_clusters=5
     #X = np.array([[1, 2], [2, 3]], [1, 4, 2], [1, 0, 2], [4, 2, 3], [4, 4, 8], [4, 0, 6]])
     new_points = np.reshape(points,(points.shape[0],68*2))    
     kmeans = KMeans(n_clusters=no_of_clusters, random_state=0).fit(new_points)
     centroid = kmeans.cluster_centers_
     centroid = np.reshape(centroid,(no_of_clusters,68,2)) 
-    print(centroid.shape)
+    #print(centroid.shape)
     panel = pd.Panel(
                     centroid,
                     items = ['Frame {}' .format(i) for i in range(0,centroid.shape[0])],
@@ -134,7 +134,7 @@ def apply_kmeans(points,path):
                     )
     pnl = panel.to_frame()
     
-    print(pnl)
+    #print(pnl)
     pnl.to_csv(path[:path.find(".")]+'/centroid_points_dataframe.csv')
     np.save(path[:path.find(".")]+'/centroid_points_array.out', centroid)   
     #np.savetxt(path[:path.find(".")]+'/centroid.out', centroid)
@@ -206,7 +206,7 @@ def find_distance(cent,no_of_clusters,distance_type,path):
         
     #print(np.array(distance_vector))
     distance_vector = np.array(distance_vector)
-    print(distance_vector)
+    #print(distance_vector)
     np.savetxt(path + "/displacement_vector.out",distance_vector)
     print(f"Displacement Vector saved to file : {path + '/displacement_vector.out'}")
     return distance_vector
@@ -230,7 +230,7 @@ def convert_to_dataframe(array,path):
     a = pd.DataFrame(data=array,index=t2,columns=t1)
     print(f'Shape of Output Dataframe : {a.shape}')
     a = a.reset_index()
-    print(a)
+    #print(a)
     a.to_csv(path + "/displacement_vector.csv")
     print("Successfully Converted \n")
     print(f'Shape of Output Dataframe : {a.shape}')
@@ -258,12 +258,43 @@ def plot_displacement_all(displacement,filename): # This function helps to plot 
     #plt.savefig(f'{folder}/{filename}.png', format='png', dpi=300) All images are saved together
     plt.savefig(f'{folder}/{filename}/{filename}.png', format='png', dpi=200) #Each image saved in different folder
     #plt.show()
+    plt.close()
     #
     #for i in range(68):
 
         #y=displacement[:, 0]
         #a.plot(y=f'landmark_{i}',ax=ax)
     #return ax    
+
+def plot_displacement_all_average(displacement,filename):
+    #print(displacement.drop(['index'],axis = 1).mean(axis = 1))
+    
+    displacement_average = displacement.drop(['index'],axis = 1).mean(axis = 1)
+    #plt.figure(figsize = (20,15))
+    print(displacement_average)
+    
+    #sns.lineplot(data=a)
+    
+
+        #ax = sns.lineplot(data = displacement, x = 'index', y = f'landmark_{i}',legend = "full" ,label = f"landmark {i}") to get legend (which doesn't fit right now)
+        #ax = sns.lineplot(data = displacement, x = 'index', y = f'landmark_{i}',legend = "full" )
+    #ax = sns.lineplot(data = displacement, x = 'index', y = f'landmark_{i}',legend = "full" )
+    
+    ax = sns.lineplot(data = displacement_average)
+  
+    sns.set_context("talk")
+    ax.set_title(f'{filename}')
+    ax.set_ylabel("Displacement Value")
+    ax.set_xlabel("Frames")
+    #plt.show()
+    #plt.legend(loc='upper center')
+    #print(f'{folder}/{filename}/{filename}.png')
+    plt.savefig(f'{folder}/{filename}/{filename}_av.png', format='png', dpi=200)
+    plt.close()
+    return displacement_average
+    #NOTE: plt.savefig(f'{folder}/{filename}/{filename}.png', format='png', dpi=200)
+
+
 def plot_displacement_single(): # This video helps to plot a SINGLE landmark point for all videos in 1 graph
     #WHAT TO DO 
     #print(displacement.shape)
@@ -295,14 +326,18 @@ def plot_displacement_single(): # This video helps to plot a SINGLE landmark poi
 
 
 if __name__ == '__main__': 
-    print(os.getcwd())
-    print(folder)
 
+    print(os.getcwd())
+    #print(folder)
+    CWD = os.getcwd()
+    emotion = CWD[CWD.rfind('/')+1 : ]
+    print(emotion)
     file_and_folder_list = os.listdir(folder)
     
-    print(file_and_folder_list[0])
-    print(os.path.isdir(f'Subjects/suject1/anger/{file_and_folder_list[0]}'))
+    
+    
     file_list = [f for f in file_and_folder_list if os.path.isfile(f)]
+    file_list = list(filter(lambda x: x.endswith('.avi'), file_list))
     print(file_list)
     folder_list = [fol for fol in file_and_folder_list if os.path.isdir(fol)]
     print(f'List of folders : {folder_list}')
@@ -311,25 +346,32 @@ if __name__ == '__main__':
     for filename in file_list:
         path_of_video= filename    
         point=FrameExtract(path_of_video,path_of_model)
-        apply_kmeans(point,path_of_video)
- 
-
-
+        apply_kmeans(point,path_of_video,5)   
     
-    
+    ave = pd.DataFrame()
     
     for foldername in folder_list:
         path = foldername 
         #print(path)   
         centroid = np.load(path + '/centroid_points_array.out.npy')
-        print(centroid.shape)
+        #print(centroid.shape)
         p1 =  np.load(path + '/landmark_points_array.out.npy')
         displacement=find_distance(centroid,centroid.shape[0],'euclidean',path)
         disp=convert_to_dataframe(displacement,path)
         #plot_displacement_single() # 
         # NOTE : Done till this check the following statement which gives errors
-        plot_displacement_all(disp,filename)
-     
+        plot_displacement_all(disp,foldername)
+        
+        ave[foldername] = plot_displacement_all_average(disp,foldername)
+        print(ave)
+    a = ave.mean(axis = 1)  
+    ax = sns.lineplot(data = a)
+    ax.set_title(f'{emotion}')
+    #plt.show()
+    ave = pd.DataFrame()
+    print(f'../average_all{emotion}.png')
+    plt.savefig(f'../average_all{emotion}.png', format='png', dpi=200)
+    print("SAVING AVERAGE FIGURE")
     #plt.savefig('anger.svg', format='svg', dpi=1200)
     #plt.show()
     #os.system('spd-say "your program has finished"')
